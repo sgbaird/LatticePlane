@@ -798,7 +798,7 @@ crystalCopy
 
 (* ::Input::Initialization:: *)
 SetupDensityHKL::odd="supercell expansion (n) should be odd";
-SetupDensityHKL[mpid_String,n_Integer:1,hklMax_Integer:3,radiusFactor:(_Real|_Integer):1/3]:=Module[{crystalData,pg,latticeParameters,\[ScriptCapitalE],\[ScriptF]tmp,R,R1,R2,R3,\[ScriptCapitalO],\[ScriptCapitalE]Unique,\[ScriptF],rKey,r,\[ScriptCapitalE]Pos,\[ScriptCapitalU],\[ScriptCapitalU]pts,reflectionList,hklList,\[ScriptCapitalP],\[ScriptCapitalR],rList,\[ScriptF]List,\[ScriptCapitalD],npts,\[ScriptCapitalA]Sym},
+SetupDensityHKL[mpid_String,n_Integer:1,hklMax_Integer:3,radiusFactor:(_Real|_Integer):1/3]:=Module[{crystalData,pg,latticeParameters,\[ScriptCapitalE],\[ScriptF]tmp,R,R1,R2,R3,\[ScriptCapitalO],\[ScriptCapitalE]Unique,covalentRadius,\[ScriptF],rKey,r,\[ScriptCapitalE]Pos,\[ScriptCapitalU],\[ScriptCapitalU]pts,reflectionList,hklList,\[ScriptCapitalP],\[ScriptCapitalR],rList,\[ScriptF]List,\[ScriptCapitalD],npts,\[ScriptCapitalA]Sym},
 
 crystalData=ImportCrystalData2[mpid<>".cif",mpid,"OverwriteWarning"->False];
 (*ExpandCrystal[mpid,{n,n,n},"NewLabel"\[Rule]mpid<>"_2","DataFile"\[Rule]mpid<>".m"];(*Defaults to 1x1x1*)*)
