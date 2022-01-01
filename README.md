@@ -1,5 +1,5 @@
 # LatticePlane
-For calculating intersections between atoms and HKL planes.
+Calculate atomic lattice plane densities in arbitrary crystal structures (CIF input) for arbitrary lattice planes (HKL indices).
 
 ## Installation
 The following instructions are adapted from https://mathematica.stackexchange.com/a/672/61736.
