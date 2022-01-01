@@ -32,7 +32,9 @@ The primary functionality of `LatticePlane` is contained in `DensityHKL[]`, whic
 where `mpid` is the Materials Project ID or other key for a CIF file assigned via `ImportCrystalData2`, `n` is the supercell size, `hklMax` is the maximum HKL index to consider, and `radiusFactorIn` is the maximum distance between the HKL plane of interest and each atom in the compound that is allowed for an atom to be considered in the intersection scheme. `Aoutn` contains the area of each element in a particular plane normalized by the radius of that atom for the unique HKL planes. `AoutCt` contains the total number of atoms (fractional values OK) of an element within a plane for the unique HKL planes. `hkl` is a list of the unique HKL planes. `Afulln`, `AfullCt`, and `hklFull` consider the degenerate HKL planes as well. Finally, `elem` is the list of unique elements.
 
 ## Plotting
-To reproduce the plots from the paper, see `PlotSymmetrizedFullHKL[]` which uses several of the outputs from `DensityHKl[]`.
+To reproduce the plots from [the paper](https://doi.org/10.33774/chemrxiv-2021-l9rp7) such as the following (annotations added manually), see `PlotSymmetrizedFullHKL[]` which uses several of the outputs from `DensityHKl[]`.
+![fe3c-ex](https://user-images.githubusercontent.com/45469701/147862349-365bc634-7db6-44fa-bc9e-2d1a9a0dd1dc.png)
+
 
 ## Examples
 Please refer to `LatticePlane-example.nb`. A high-throughput calculation workflow and machine learning application is given in `ml-test.nb`.
