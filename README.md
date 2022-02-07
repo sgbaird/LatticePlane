@@ -2,7 +2,7 @@
 Calculate atomic lattice plane densities in arbitrary crystal structures (CIF input) for arbitrary lattice planes (HKL indices).
 
 ## Dependencies
-[MaXrd package](https://github.com/Stianpr20/MaXrd) (this is included in this repo, please see MaXrd for citation information).
+- [MaXrd package](https://github.com/Stianpr20/MaXrd)
 
 ## Installation
 The following instructions are adapted from https://mathematica.stackexchange.com/a/672/61736.
