@@ -108,7 +108,7 @@ P=Position[\[ScriptCapitalC],_?(ContainsAny[#,{1}]&),1]//Flatten;
 i=DeleteCases[Flatten[\[ScriptCapitalC][[P]]],1];
 \[ScriptCapitalN]=\[ScriptP][[i]];
 \[ScriptCapitalO]=\[ScriptP][[1]];(*\[ScriptCapitalN]=Nearest[\[ScriptP]\[LeftDoubleBracket]2;;\[RightDoubleBracket],\[ScriptCapitalO],3];*)
-Parallelepiped[\[ScriptCapitalO],\[ScriptCapitalN]]
+N@Parallelepiped[\[ScriptCapitalO],\[ScriptCapitalN]]
 ]
 
 
@@ -143,6 +143,7 @@ PlaneIntersection[\[ScriptCapitalP]_,\[ScriptCapitalU]_]:=Module[{\[ScriptCapita
 If[Head@\[ScriptCapitalP]===InfinitePlane,\[ScriptCapitalP]1={\[ScriptCapitalP]},\[ScriptCapitalP]1=\[ScriptCapitalP]];
 \[ScriptCapitalB]=RegionResize[BoundingRegion[\[ScriptCapitalU]],Scaled@Rationalize[1.1(*100$MachineEpsilon*)]];(*for cropping the plane*)
 \[ScriptCapitalP]crop=RegionIntersection[#,\[ScriptCapitalB]]&/@\[ScriptCapitalP]1;
+\[ScriptCapitalP]crop=CanonicalizePolygon/@N[\[ScriptCapitalP]crop];
 \[ScriptCapitalP]int=RegionIntersection[#,N@\[ScriptCapitalU]]&/@N[\[ScriptCapitalP]crop];
 shapes=OpenCascadeShape[#]&/@\[ScriptCapitalP]int;
 bmesh=OpenCascadeShapeSurfaceMeshToBoundaryMesh[#]&/@shapes;
@@ -798,7 +799,7 @@ crystalCopy
 
 (* ::Input::Initialization:: *)
 SetupDensityHKL::odd="supercell expansion (n) should be odd";
-SetupDensityHKL[mpid_String,n_Integer:1,hklMax_Integer:3,radiusFactor:(_Real|_Integer):1/3]:=Module[{crystalData,pg,latticeParameters,\[ScriptCapitalE],\[ScriptF]tmp,R,R1,R2,R3,\[ScriptCapitalO],\[ScriptCapitalE]Unique,covalentRadius,\[ScriptF],rKey,r,\[ScriptCapitalE]Pos,\[ScriptCapitalU],\[ScriptCapitalU]pts,reflectionList,absentQ,validReflections,hklList,\[ScriptCapitalP],\[ScriptCapitalR],rList,\[ScriptF]List,\[ScriptCapitalD],npts,\[ScriptCapitalA]Sym},
+SetupDensityHKL[mpid_String,n_Integer:1,hklMax_Integer:3,radiusFactor:(_Real|_Integer|_Rational):1/3]:=Module[{crystalData,pg,latticeParameters,\[ScriptCapitalE],\[ScriptF]tmp,R,R1,R2,R3,\[ScriptCapitalO],\[ScriptCapitalE]Unique,covalentRadius,\[ScriptF],rKey,r,\[ScriptCapitalE]Pos,\[ScriptCapitalU],\[ScriptCapitalU]pts,reflectionList,absentQ,validReflections,hklList,\[ScriptCapitalP],\[ScriptCapitalR],rList,\[ScriptF]List,\[ScriptCapitalD],npts,\[ScriptCapitalA]Sym},
 
 crystalData=ImportCrystalData2[mpid<>".cif",mpid,"OverwriteWarning"->False];
 (*ExpandCrystal[mpid,{n,n,n},"NewLabel"\[Rule]mpid<>"_2","DataFile"\[Rule]mpid<>".m"];(*Defaults to 1x1x1*)*)
@@ -825,9 +826,10 @@ r=radiusFactor*ReplaceAll[\[ScriptCapitalE],Thread[\[ScriptCapitalE]Unique->rKey
 \[ScriptCapitalU]=RationalUnitCell[R,n];
 
 reflectionList=ReflectionList@hklMax;
-absentQ=SystematicAbsentQ[group,reflectionList];
-validReflections=Pick[reflectionList,absentQ,False];
-hklList=MergeSymmetryEquivalentReflections[pg,validReflections,"ToStandardSetting"->False];
+(*absentQ=SystematicAbsentQ[pg,reflectionList];
+validReflections=Pick[reflectionList,absentQ,False];*)
+validReflections=reflectionList;
+hklList=MergeSymmetryEquivalentReflections[pg,validReflections(*,"ToStandardSetting"\[Rule]False*)];
 \[ScriptCapitalP]=MillerToPlane[#,R]&/@hklList;
 \[ScriptCapitalR]=PlaneIntersection[\[ScriptCapitalP],\[ScriptCapitalU]];
 \[ScriptF]List=\[ScriptF][[#/.\[ScriptCapitalE]Pos]]&/@\[ScriptCapitalE]Unique;
@@ -877,7 +879,7 @@ AtomProbabilityIntersection[\[ScriptCapitalD]_,P_]:=(*Parallel*)Table[Quiet[NInt
 
 
 (* ::Input::Initialization:: *)
-ProbabilityIntersection[\[ScriptCapitalD]_,\[ScriptCapitalR]_,\[ScriptCapitalP]_,n:(_Real|_Integer):3.99,radiusFactor:(_Real|_Integer):1/4]:=Module[{\[ScriptF]List,rList,distances,d,id,\[ScriptCapitalD]2,\[ScriptCapitalI]int,ids,\[ScriptCapitalA]int},
+ProbabilityIntersection[\[ScriptCapitalD]_,\[ScriptCapitalR]_,\[ScriptCapitalP]_,n:(_Real|_Integer):3.99,radiusFactor:(_Real|_Integer|_Rational):1/4]:=Module[{\[ScriptF]List,rList,distances,d,id,\[ScriptCapitalD]2,\[ScriptCapitalI]int,ids,\[ScriptCapitalA]int},
 \[ScriptF]List=\[ScriptCapitalD][[;;,;;,1]];
 rList=\[ScriptCapitalD][[;;,;;,2,1,1]][[;;,1]];(*assumes isotropic radius and assumes constant radius for a particular element*)
 d=Table[RegionDistance[i,j],{i,\[ScriptCapitalP]},{j,#}]&/@\[ScriptF]List;
@@ -893,22 +895,25 @@ ReplacePart[\[ScriptCapitalI]int,ids->0];
 
 
 (* ::Input::Initialization:: *)
-GetFullHKL[valsIn_,hklIn_,pg_]:=Module[{max,\[ScriptR],pi,reflectionList,hklList,valsReplace,n,npts,vals2,hklListSub,valsSub},
+GetFullHKL[valsIn_,hklIn_,pg_]:=Module[{max,\[ScriptR],absentQ,\[ScriptR]valid,pi,hklList,valsReplace,n,npts,vals2,hklListSub,valsSub},
 max=Max@hklIn;
 \[ScriptR]=ReflectionList@max;
-pi=PositionIndex[ToStandardSetting[pg,#]&/@\[ScriptR]];(*degenerate sets*)
-hklList=MergeSymmetryEquivalentReflections[pg,\[ScriptR]];
+(*absentQ=SystematicAbsentQ[pg,\[ScriptR]];
+\[ScriptR]valid=Pick[\[ScriptR],absentQ,False];*)
+\[ScriptR]valid=\[ScriptR];
+pi=PositionIndex[ToStandardSetting[pg,#]&/@\[ScriptR]valid];(*degenerate sets*)
+hklList=MergeSymmetryEquivalentReflections[pg,\[ScriptR]valid,ToStandardSetting->False];
 valsReplace=Thread[Keys@PositionIndex[hklList]->valsIn]/.pi;
 n=Length/@Keys@valsReplace;
-npts=Length@\[ScriptR];
+npts=Length@\[ScriptR]valid;
 vals2=Range@npts/.(Thread[Keys@#->Values@#]&/@valsReplace//Flatten);
-{\[ScriptR],vals2}
+{\[ScriptR]valid,vals2}
 ]
 
 
 (* ::Input::Initialization:: *)
 DensityHKL::mpidNotString="A string was expected for mpid.";
-DensityHKL[mpid_:"mp-134",n_Integer:1,hklMax_Integer:3,dFactor:(_Real|_Integer):0.01,radiusFactorIn:(_Real|_Integer):0,OptionsPattern[{"Method"->"PDF","Output"->"PackingFraction","PrintID"->False,"PrintMethod"->False}]]:=Module[{method,radiusFactor,\[ScriptCapitalD],\[ScriptCapitalR],\[ScriptCapitalP],\[ScriptCapitalA]Sym,\[ScriptF]List,rList,hklList,\[ScriptCapitalE]Unique,\[ScriptCapitalA]out,\[ScriptCapitalA]outn,\[ScriptCapitalA]outCt,pg,hklFull,outCt,outn,\[ScriptCapitalA]fulln,\[ScriptCapitalA]fullCt},
+DensityHKL[mpid_:"mp-134",n_Integer:1,hklMax_Integer:3,dFactor:(_Real|_Integer|_Rational):0.01,radiusFactorIn:(_Real|_Integer|_Rational):0,OptionsPattern[{"Method"->"PDF","Output"->"PackingFraction","PrintID"->False,"PrintMethod"->False}]]:=Module[{method,radiusFactor,\[ScriptCapitalD],\[ScriptCapitalR],\[ScriptCapitalP],\[ScriptCapitalA]Sym,\[ScriptF]List,rList,hklList,\[ScriptCapitalE]Unique,\[ScriptCapitalA]out,\[ScriptCapitalA]outn,\[ScriptCapitalA]outCt,pg,hklFull,outCt,outn,\[ScriptCapitalA]fulln,\[ScriptCapitalA]fullCt},
 (*If[Head@mpid=!=String,Message[DensityHKL::mpidNotString];Abort[]];*)
 If[OptionValue["PrintID"],Print@mpid];
 method=OptionValue["Method"];
@@ -931,13 +936,16 @@ outCt=GetFullHKL[#,hklList,pg]&/@\[ScriptCapitalA]outCt;
 
 
 (* ::Input::Initialization:: *)
-PlotSetup[mpid_,n_:3,hklMax_:4]:=Module[{pg,reflectionList,hklList},
+PlotSetup[mpid_,n_:3,hklMax_:4]:=Module[{crystalData,pg,reflectionList,absentQ,validReflections,hklList},
 crystalData=ImportCrystalData2[mpid<>".cif",mpid,"OverwriteWarning"->False];
 crystalData=ExpandCrystal2[crystalData,{n,n,n}];
 pg=crystalData[["SpaceGroup"]];
 reflectionList=ReflectionList@hklMax;
-hklList=MergeSymmetryEquivalentReflections[pg,reflectionList];
-{hklList,reflectionList,pg}
+(*absentQ=SystematicAbsentQ[pg,reflectionList];
+validReflections=Pick[reflectionList,absentQ,False];*)
+validReflections=reflectionList;
+hklList=MergeSymmetryEquivalentReflections[pg,validReflections(*,ToStandardSetting\[Rule]False*)];
+{hklList,validReflections,pg}
 ]
 
 
@@ -964,7 +972,7 @@ Show[Legended[g1,BarLegend[{c,c[[3]]},LegendLabel->legendLabel]],Graphics3D@{Edg
 (* ::Input::Initialization:: *)
 PlotSymmetrizedFullHKL[\[ScriptCapitalA]outNorm:_,hklList:_,pg_,\[ScriptCapitalE]Unique:_,tag_:"\[Integral]"]:=Module[{str,x},
 str[x_]:=StringTemplate["\!\(\*FractionBox[SubscriptBox[\(\[ScriptCapitalA]\), \(`tag`, `element`\)], SubscriptBox[\(\[ScriptCapitalA]\), \(hkl\)]]\)(\!\(\*SuperscriptBox[\(\[CapitalARing]\), \(-2\)]\))"][<|"element"->x,"tag"->tag|>];
-Grid[MapThread[{PlotSymmetrizedHKL[#1,hklList,str[#2]][[1]],PlotFullHKL[#1,hklList,pg,str[#2]]}&,
+Grid[MapThread[{PlotSymmetrizedHKL[#1,hklList,str[#2]],PlotFullHKL[#1,hklList,pg,str[#2]]}&,
 {\[ScriptCapitalA]outNorm,\[ScriptCapitalE]Unique}]]
 ]
 
