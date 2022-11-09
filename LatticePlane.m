@@ -108,7 +108,7 @@ P=Position[\[ScriptCapitalC],_?(ContainsAny[#,{1}]&),1]//Flatten;
 i=DeleteCases[Flatten[\[ScriptCapitalC][[P]]],1];
 \[ScriptCapitalN]=\[ScriptP][[i]];
 \[ScriptCapitalO]=\[ScriptP][[1]];(*\[ScriptCapitalN]=Nearest[\[ScriptP]\[LeftDoubleBracket]2;;\[RightDoubleBracket],\[ScriptCapitalO],3];*)
-N@Parallelepiped[\[ScriptCapitalO],\[ScriptCapitalN]]
+Parallelepiped[\[ScriptCapitalO],\[ScriptCapitalN]]
 ]
 
 
@@ -902,7 +902,7 @@ max=Max@hklIn;
 \[ScriptR]valid=Pick[\[ScriptR],absentQ,False];*)
 \[ScriptR]valid=\[ScriptR];
 pi=PositionIndex[ToStandardSetting[pg,#]&/@\[ScriptR]valid];(*degenerate sets*)
-hklList=MergeSymmetryEquivalentReflections[pg,\[ScriptR]valid,ToStandardSetting->False];
+hklList=MergeSymmetryEquivalentReflections[pg,\[ScriptR]valid(*,ToStandardSetting\[Rule]False*)];
 valsReplace=Thread[Keys@PositionIndex[hklList]->valsIn]/.pi;
 n=Length/@Keys@valsReplace;
 npts=Length@\[ScriptR]valid;
